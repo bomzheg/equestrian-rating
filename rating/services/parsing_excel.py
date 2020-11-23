@@ -1,7 +1,6 @@
 import typing
 from datetime import date
 
-from django.db.models import Manager
 from openpyxl import load_workbook
 from openpyxl.worksheet import worksheet
 
