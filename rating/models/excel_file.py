@@ -10,11 +10,11 @@ class ExcelTableFile(models.Model):
         verbose_name="Файл с результатами",
         upload_to=str(BASE_DIR / 'uploads/'),
     )
-    to_standard = models.ForeignKey(
-        "Standard",
+    to_discipline = models.ForeignKey(
+        "Discipline",
         on_delete=models.PROTECT,
         related_name="excel_files",
-        verbose_name="Норматив",
+        verbose_name="Дисциплина",
     )
 
     class Meta:
@@ -22,7 +22,13 @@ class ExcelTableFile(models.Model):
         verbose_name = "Файл с выполненными нормативами"
         verbose_name_plural = "Файлы с выполненными нормативами"
 
-    def save(self, *args, **kwargs):
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
         results = parse_workbook(self.file)
-        save_results(results, self.to_standard)
-        super(ExcelTableFile, self).save(*args, **kwargs)
+        save_results(results, using)
+        super(ExcelTableFile, self).save(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields
+        )
