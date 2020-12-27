@@ -1,7 +1,5 @@
 from django.urls import path
 
-from rating import views
+from rating.views import DefaultView
 
-urlpatterns = [
-    path("about/", views.AboutView.as_view())
-]
+urlpatterns = [path('', DefaultView.as_view())]

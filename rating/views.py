@@ -1,6 +1,16 @@
+from django.http import HttpResponse
 from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.views.generic.base import View
 
 
-class AboutView(TemplateView):
-    template_name = "about.html"
+class DefaultView(View):
+    def get(self, request):
+        res = dict(
+            number=1,
+            date="2020-12-25",
+            rider_name="Анна",
+            horse_name="Бузина",
+            result="100",
+            club_name="Алмаз"
+        )
+        return render(request, 'rating.html', {"rating": [res, res]})
