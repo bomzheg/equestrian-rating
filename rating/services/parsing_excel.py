@@ -2,6 +2,7 @@ import datetime
 import typing
 from datetime import date
 
+from loguru import logger
 from openpyxl import load_workbook
 from openpyxl.worksheet import worksheet
 
@@ -32,13 +33,13 @@ def parse_worksheet(ws: worksheet) -> typing.List[Result]:
     standard = get_standard(ws)
     results = []
     while not is_empty_row(ws, row):
-        day = ws.cell(row=row, col=DAY_ROW).value
-        year = ws.cell(row=row, col=YEAR_ROW).value
+        day = ws.cell(row=row, column=DAY_ROW).value
+        year = ws.cell(row=row, column=YEAR_ROW).value
         date_ = get_date_by_russian_date(day, year)
 
-        horse_name = ws.cell(row=row, col=HORSE_NAME_ROW).value
-        athlete_name = ws.cell(row=row, col=ATHLETE_NAME_ROW).value
-        club_name = ws.cell(row=row, col=CLUB_NAME_ROW).value
+        horse_name = ws.cell(row=row, column=HORSE_NAME_ROW).value
+        athlete_name = ws.cell(row=row, column=ATHLETE_NAME_ROW).value
+        club_name = ws.cell(row=row, column=CLUB_NAME_ROW).value
         results.append(Result(
             fulfilled_standard=standard,
             date=date_,
@@ -46,6 +47,8 @@ def parse_worksheet(ws: worksheet) -> typing.List[Result]:
             athlete_name=athlete_name,
             club_name=club_name,
         ))
+        logger.debug("load new result {}", results[-1])
+        row += 1
     return results
 
 
@@ -53,11 +56,11 @@ def get_standard(ws: worksheet) -> Standard:
     return Standard(
         name=ws.cell(
             row=STANDARD_NAME_ROW,
-            col=STANDARD_NAME_COL
+            column=STANDARD_NAME_COL
         ).value,
         description=ws.cell(
             row=STANDARD_DESCRIPTION_ROW,
-            col=STANDARD_DESCRIPTION_COL
+            column=STANDARD_DESCRIPTION_COL
         ).value,
     )
 
@@ -65,24 +68,24 @@ def get_standard(ws: worksheet) -> Standard:
 def get_date_by_russian_date(day_text: str, year: int) -> date:
     day, month = day_text.split()
     month = translate_month_name(month)
-    date = datetime.datetime.strptime("")
-    raise NotImplemented
+    day = int(day)
+    return date(year, month, day)
 
 
-def translate_month_name(month_name_ru: str) -> str:
+def translate_month_name(month_name_ru: str) -> int:
     converter = {
-        'января': 'jan',
-        'февраля': 'feb',
-        'марта': 'mar',
-        'апреля': 'apr',
-        'мая': 'may',
-        'июня': 'jun',
-        'июля': 'jul',
-        'августа': 'aug',
-        'сентября': 'sep',
-        'октября': 'oct',
-        'ноября': 'nov',
-        'декабря': 'dec',
+        'января': 1,
+        'февраля': 2,
+        'марта': 3,
+        'апреля': 4,
+        'мая': 5,
+        'июня': 6,
+        'июля': 7,
+        'августа': 8,
+        'сентября': 9,
+        'октября': 10,
+        'ноября': 11,
+        'декабря': 12,
     }
     try:
         return converter[month_name_ru]
@@ -95,14 +98,14 @@ def translate_month_name(month_name_ru: str) -> str:
 
 def search_first_line(ws: worksheet) -> int:
     for row_index in range(1, MAX_ROW_SEARCH):
-        if ws.cell(row=row_index, col=DAY_ROW).value == "Дата":
+        if ws.cell(row=row_index, column=DAY_ROW).value == "Дата":
             return row_index + 1  # use next row after header
 
 
 def is_empty_row(ws: worksheet, row: int) -> bool:
-    return ws.cell(row=row, col=DAY_ROW).value is None
+    return ws.cell(row=row, column=DAY_ROW).value is None
 
 
 def save_results(results: typing.List[Result], using=None):
     # noinspection PyUnresolvedReferences
-    Result.objects.bulk_create(results, using=using)
+    Result.objects.bulk_create(results)
