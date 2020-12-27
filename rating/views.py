@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.base import View
 
@@ -13,5 +14,3 @@ class DefaultView(View):
             club_name="Алмаз"
         )
         return render(request, 'rating.html', {"results": [res, res]})
-
-
