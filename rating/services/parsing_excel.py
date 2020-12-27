@@ -1,3 +1,4 @@
+import datetime
 import typing
 from datetime import date
 
@@ -12,6 +13,10 @@ YEAR_ROW = 2
 HORSE_NAME_ROW = 3
 ATHLETE_NAME_ROW = 4
 CLUB_NAME_ROW = 5
+STANDARD_NAME_ROW = 1
+STANDARD_NAME_COL = 4
+STANDARD_DESCRIPTION_ROW = 3
+STANDARD_DESCRIPTION_COL = 3
 
 
 def parse_workbook(file) -> typing.List[Result]:
@@ -29,10 +34,11 @@ def parse_worksheet(ws: worksheet) -> typing.List[Result]:
     while not is_empty_row(ws, row):
         day = ws.cell(row=row, col=DAY_ROW).value
         year = ws.cell(row=row, col=YEAR_ROW).value
+        date_ = get_date_by_russian_date(day, year)
+
         horse_name = ws.cell(row=row, col=HORSE_NAME_ROW).value
         athlete_name = ws.cell(row=row, col=ATHLETE_NAME_ROW).value
         club_name = ws.cell(row=row, col=CLUB_NAME_ROW).value
-        date_ = get_date_by_russian_date(day, year)
         results.append(Result(
             fulfilled_standard=standard,
             date=date_,
@@ -44,11 +50,47 @@ def parse_worksheet(ws: worksheet) -> typing.List[Result]:
 
 
 def get_standard(ws: worksheet) -> Standard:
-    raise NotImplemented
+    return Standard(
+        name=ws.cell(
+            row=STANDARD_NAME_ROW,
+            col=STANDARD_NAME_COL
+        ).value,
+        description=ws.cell(
+            row=STANDARD_DESCRIPTION_ROW,
+            col=STANDARD_DESCRIPTION_COL
+        ).value,
+    )
 
 
 def get_date_by_russian_date(day_text: str, year: int) -> date:
+    day, month = day_text.split()
+    month = translate_month_name(month)
+    date = datetime.datetime.strptime("")
     raise NotImplemented
+
+
+def translate_month_name(month_name_ru: str) -> str:
+    converter = {
+        'января': 'jan',
+        'февраля': 'feb',
+        'марта': 'mar',
+        'апреля': 'apr',
+        'мая': 'may',
+        'июня': 'jun',
+        'июля': 'jul',
+        'августа': 'aug',
+        'сентября': 'sep',
+        'октября': 'oct',
+        'ноября': 'nov',
+        'декабря': 'dec',
+    }
+    try:
+        return converter[month_name_ru]
+    except KeyError:
+        raise ValueError(
+            "In month mast be str with russian name of month, "
+            f"found {month_name_ru}"
+        )
 
 
 def search_first_line(ws: worksheet) -> int:
