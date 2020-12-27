@@ -14,5 +14,3 @@ class DefaultView(View):
             club_name="Алмаз"
         )
         return render(request, 'rating.html', {"rating": [res, res]})
-
-

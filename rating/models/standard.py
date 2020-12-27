@@ -1,0 +1,20 @@
+from django.db import models
+
+
+class Standard(models.Model):
+    """Разновидность норматива"""
+    name = models.CharField(max_length=256, verbose_name="Название стандарта")
+    discipline = models.ForeignKey(
+        "Discipline",
+        on_delete=models.PROTECT,
+        related_name="standards",
+        verbose_name="Дисциплина",
+    )
+
+    class Meta:
+        db_table = "standards"
+        verbose_name = "Норматив"
+        verbose_name_plural = "Нормативы"
+
+    def __str__(self):
+        return self.name
