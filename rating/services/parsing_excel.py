@@ -6,7 +6,7 @@ from loguru import logger
 from openpyxl import load_workbook
 from openpyxl.worksheet import worksheet
 
-from rating.models import Result, Standard
+from rating.models import Result, Standard, Discipline
 
 MAX_ROW_SEARCH = 1000
 DAY_ROW = 1
@@ -20,15 +20,15 @@ STANDARD_DESCRIPTION_ROW = 3
 STANDARD_DESCRIPTION_COL = 3
 
 
-def parse_workbook(file) -> typing.List[Result]:
+def parse_workbook(file) -> typing.List[typing.Tuple[typing.List[Result], Standard]]:
     wb = load_workbook(file)
     results = []
     for ws in wb.worksheets:
-        results.extend(parse_worksheet(ws))
+        results.append(parse_worksheet(ws))
     return results
 
 
-def parse_worksheet(ws: worksheet) -> typing.List[Result]:
+def parse_worksheet(ws: worksheet) -> typing.Tuple[typing.List[Result], Standard]:
     row = search_first_line(ws)
     standard = get_standard(ws)
     results = []
@@ -41,7 +41,6 @@ def parse_worksheet(ws: worksheet) -> typing.List[Result]:
         athlete_name = ws.cell(row=row, column=ATHLETE_NAME_ROW).value
         club_name = ws.cell(row=row, column=CLUB_NAME_ROW).value
         results.append(Result(
-            fulfilled_standard=standard,
             date=date_,
             horse_name=horse_name,
             athlete_name=athlete_name,
@@ -49,7 +48,7 @@ def parse_worksheet(ws: worksheet) -> typing.List[Result]:
         ))
         logger.debug("load new result {}", results[-1])
         row += 1
-    return results
+    return results, standard
 
 
 def get_standard(ws: worksheet) -> Standard:
@@ -106,6 +105,10 @@ def is_empty_row(ws: worksheet, row: int) -> bool:
     return ws.cell(row=row, column=DAY_ROW).value is None
 
 
-def save_results(results: typing.List[Result], using=None):
+def save_results(results: typing.List[Result], to_discipline: Discipline, standard: Standard, using=None):
+    standard.discipline = to_discipline
+    standard.save(using=using)
+    for result in results:
+        result.fulfilled_standard = standard
     # noinspection PyUnresolvedReferences
     Result.objects.bulk_create(results)

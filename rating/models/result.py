@@ -12,7 +12,7 @@ class Result(models.Model):
     date = models.DateField(verbose_name="Дата соревнований")
     horse_name = models.CharField(max_length=64, verbose_name="Лошадь")
     athlete_name = models.CharField(max_length=128, verbose_name="Спортсмен")
-    club_name = models.CharField(max_length=64, verbose_name="Клуб")
+    club_name = models.CharField(max_length=64, verbose_name="Клуб", null=True)
 
     class Meta:
         db_table = "results"

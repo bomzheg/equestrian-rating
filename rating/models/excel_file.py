@@ -24,11 +24,12 @@ class ExcelTableFile(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        results = parse_workbook(self.file)
-        save_results(results, using)
-        super(ExcelTableFile, self).save(
-            force_insert=force_insert,
-            force_update=force_update,
-            using=using,
-            update_fields=update_fields
-        )
+        result_all = parse_workbook(self.file)
+        for results, standard in result_all:
+            save_results(results, self.to_discipline, standard, using)
+            super(ExcelTableFile, self).save(
+                force_insert=force_insert,
+                force_update=force_update,
+                using=using,
+                update_fields=update_fields
+            )
