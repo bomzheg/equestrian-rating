@@ -2,15 +2,11 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.base import View
 
+from rating.models import Standard, Result
+
 
 class DefaultView(View):
     def get(self, request):
-        res = dict(
-            number=1,
-            date="2020-12-25",
-            rider_name="Анна",
-            horse_name="Бузина",
-            result="100",
-            club_name="Алмаз"
-        )
-        return render(request, 'rating.html', {"results": [res, res]})
+        standard = Standard.objects.get(id=1)
+        results = Result.objects.filter(fulfilled_standard=standard).all()
+        return render(request, 'rating.html', {"results": results, "standard": standard, "discipline": standard.discipline})
