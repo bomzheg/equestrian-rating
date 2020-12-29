@@ -2,3 +2,6 @@ django==2.2.10
 loguru
 python-dotenv
 openpyxl
+beautifulsoup4
+lxml
+requests
