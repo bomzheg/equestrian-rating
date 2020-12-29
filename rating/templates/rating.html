@@ -1,4 +1,8 @@
 {% extends "./base.html" %}
+{% block header %}
+<h2>{{discipline.name}} - {{standard.name}}</h2>
+<h3>{{standard.description}}</h3>
+{% endblock %}
 {% block content %}
 <table>
     <tr>
@@ -6,16 +10,14 @@
         <th>Дата</th>
         <th>ФИО спорстмена</th>
         <th>Лошадь</th>
-        <th>Результат</th>
         <th>Клуб</th>
     </tr>
     {% for result in results %}
     <tr>
-        <td>{{result.number}}</td>
+        <td>i</td>
         <td>{{result.date}}</td>
-        <td>{{result.rider_name}}</td>
+        <td>{{result.athlete_name}}</td>
         <td>{{result.horse_name}}</td>
-        <td>{{result.result}}</td>
         <td>{{result.club_name}}</td>
     </tr>
     {% endfor %}
