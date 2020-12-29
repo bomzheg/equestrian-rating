@@ -4,13 +4,14 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 import re
+from time import sleep
 
-import requests
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from dotenv import load_dotenv
 
 from rating.services.date_utils import get_date_by_russian_date
+from rating.services.equestrian_downloader import EquestrianDownloader
 
 BASE_DIR = Path(__file__).parent.parent.parent
 
@@ -18,8 +19,6 @@ load_dotenv(BASE_DIR / ".env")
 
 EQUESTRIAN_LOGIN = os.getenv('EQUESTRIAN_LOGIN')
 EQUESTRIAN_PASSWORD = os.getenv('EQUESTRIAN_PASSWORD')
-URL = "https://www.equestrian.ru/sport/jw_stat/?date_start=2019-10-01&date_end=2019-10-31&height_min=80&height_max=80"
-LOGIN_URL = "https://www.equestrian.ru/login.php"
 CAPTION_PATTERN = re.compile(r"Статистика по стартам \d{1,2}(?: [а-я]+)? — \d{1,2} [а-я]+ (\d{4})")
 
 
@@ -29,43 +28,6 @@ class ResultsParsing:
     horse_name: str = None
     athlete_name: str = None
     club: str = None
-
-
-def authorize(login_url: str, login: str, password: str) -> dict:
-    response = requests.post(
-        login_url,
-        headers={"ContentType": "application/x-www-form-urlencoded"},
-        data={"login": login, "passwd": password, "returnto": "/"}
-    )
-    if not response.ok:
-        raise IOError
-    return {"Cookie": response.request.headers['Cookie']}
-
-
-def download_page(cookies: dict, url: str, payload: dict) -> str:
-    response = requests.get(url, cookies=cookies, params=payload)
-    if not response.ok:
-        raise IOError
-    return response.text
-
-
-def get_url_jumping(date_from, date_to, height_from, height_to) -> typing.Tuple[str, dict]:
-    """
-    this function return payload and url
-    payload like date_start=2019-10-01&date_end=2019-10-31&height_min=80&height_max=80
-    """
-    url_template = "https://www.equestrian.ru/sport/jw_stat"
-    date_from_key = "date_start"
-    date_to_key = "date_end"
-    height_from_key = "height_min"
-    height_to_key = "height_max"
-    payload = {
-        date_from_key: date_from,
-        date_to_key: date_to,
-        height_from_key: height_from,
-        height_to_key: height_to,
-    }
-    return url_template, payload
 
 
 def parse(html_text: str):
@@ -122,19 +84,27 @@ def parse_tr(tr: Tag, year: int) -> ResultsParsing:
 
 
 def save_page():
-    cookie = authorize(LOGIN_URL, EQUESTRIAN_LOGIN, EQUESTRIAN_PASSWORD)
-    page = download_page(cookie, *get_url_jumping(
+    downloader = EquestrianDownloader(EQUESTRIAN_LOGIN, EQUESTRIAN_PASSWORD)
+    page = downloader.download_jumping(
         date(2020, 2, 1),
         date(2020, 10, 31),
         80,
         80,
-    ))
-    with open("page.html", "w") as f:
+    )
+    with open("jumping.html", "w") as f:
+        f.write(page)
+    sleep(5)
+    page = downloader.download_dressage(
+        date(2020, 2, 1),
+        date(2020, 10, 31),
+        66,
+    )
+    with open("dressage.html", "w") as f:
         f.write(page)
 
 
 def load_page():
-    with open("page.html", "r", encoding='1251') as f:
+    with open("jumping.html", "r", encoding='1251') as f:
         html_page = f.read()
     return html_page
 
