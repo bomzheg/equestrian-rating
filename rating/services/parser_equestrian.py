@@ -83,7 +83,7 @@ def parse_tr(tr: Tag, year: int) -> ResultsParsing:
     )
 
 
-def save_page():
+def _save_page():
     downloader = EquestrianDownloader(EQUESTRIAN_LOGIN, EQUESTRIAN_PASSWORD)
     page = downloader.download_jumping(
         date(2020, 2, 1),
@@ -103,7 +103,7 @@ def save_page():
         f.write(page)
 
 
-def load_page():
+def _load_page():
     with open("jumping.html", "r", encoding='1251') as f:
         html_page = f.read()
     return html_page
@@ -117,5 +117,5 @@ def write_csv(data: typing.List[ResultsParsing]):
 
 
 if __name__ == '__main__':
-    save_page()
-    write_csv(parse(load_page()))
+    _save_page()
+    write_csv(parse(_load_page()))
