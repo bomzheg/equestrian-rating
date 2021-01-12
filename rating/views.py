@@ -2,11 +2,19 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.base import View
 
-from rating.models import Standard, Result
+from rating.models import Standard, Result, Discipline
 
 
 class DefaultView(View):
     def get(self, request):
-        standard = Standard.objects.get(id=1)
-        results = Result.objects.filter(fulfilled_standard=standard).all()
-        return render(request, 'rating.html', {"results": results, "standard": standard, "discipline": standard.discipline})
+        disciplines = Discipline.objects.all()
+        current_discipline = disciplines[0]
+        standards = Standard.objects.filter(discipline=current_discipline).all()
+        results = Result.objects.filter(fulfilled_standard=standards[0]).all()
+        return render(request, 'jumping_rating.html', {
+            "results": results,
+            "standard": standards[0],
+            "discipline": current_discipline,
+            "disciplines": disciplines,
+            "standards": standards
+        })
