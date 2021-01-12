@@ -11,6 +11,7 @@ class Standard(models.Model):
         related_name="standards",
         verbose_name="Дисциплина",
     )
+    link = models.CharField(max_length=64, verbose_name="Имя для ссылки")
 
     class Meta:
         db_table = "standards"

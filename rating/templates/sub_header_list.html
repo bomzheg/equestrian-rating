@@ -1,0 +1,7 @@
+{% for standard in standards %}
+<ul>
+    <li><a href="{{standard.discipline.link}}/{{standard.link}}" title="{{standard.description}}">
+        {{standard.name}}
+    </a></li>
+</ul>
+{% endfor %}
