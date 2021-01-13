@@ -10,12 +10,19 @@
 </head>
 
 <body>
-    <header>
-        <div class="container main_header">
-            {% include "header_list.html" %}
+    <header class="main-header">
+        <div class="container">
+            <nav class="menu main-menu">
+                <ul>
+                    <li><a href="/jumping/">Конкур</a></li>
+                    <li><a href="/dressage/">Выездка</a></li>
+                </ul>
+            </nav>
         </div>
-        <div class="container second_header">
-            {% include "sub_header_list.html" %}
+        <div class="container">
+            <nav class="menu">
+                {% include "sub_header_list.html" %}
+            </nav>
         </div>
     </header>
     <section>

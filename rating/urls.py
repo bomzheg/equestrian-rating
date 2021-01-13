@@ -1,5 +1,7 @@
 from django.urls import path
 
-from rating.views import DefaultView
+from rating.views import JumpingView
 
-urlpatterns = [path('', DefaultView.as_view())]
+urlpatterns = [
+    path('jumping/', JumpingView.as_view()),
+]

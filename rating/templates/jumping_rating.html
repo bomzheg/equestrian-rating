@@ -4,7 +4,7 @@
 <h3>{{standard.description}}</h3>
 {% endblock %}
 {% block content %}
-<table>
+<table class="results">
     <tr>
         <th>№</th>
         <th>Дата</th>
@@ -14,8 +14,8 @@
     </tr>
     {% for result in results %}
     <tr>
-        <td>i</td>
-        <td>{{result.date}}</td>
+        <td>{{forloop.counter}}</td>
+        <td>{{result.date|date:'Y-m-d'}}</td>
         <td>{{result.athlete_name}}</td>
         <td>{{result.horse_name}}</td>
         <td>{{result.club_name}}</td>

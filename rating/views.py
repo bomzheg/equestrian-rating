@@ -1,11 +1,10 @@
-from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.base import View
 
 from rating.models import Standard, Result, Discipline
 
 
-class DefaultView(View):
+class JumpingView(View):
     def get(self, request):
         disciplines = Discipline.objects.all()
         current_discipline = disciplines[0]
@@ -15,6 +14,5 @@ class DefaultView(View):
             "results": results,
             "standard": standards[0],
             "discipline": current_discipline,
-            "disciplines": disciplines,
             "standards": standards
         })
